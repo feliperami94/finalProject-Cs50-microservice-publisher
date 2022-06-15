@@ -1,12 +1,9 @@
 package com.santiagoposadag.cs50.receiverpublisher.routers;
 
-
 import com.santiagoposadag.cs50.receiverpublisher.dto.CryptoCurrencyDto;
 import com.santiagoposadag.cs50.receiverpublisher.dto.UserDto;
 import com.santiagoposadag.cs50.receiverpublisher.usecases.PostMessageToRabbitUseCase;
 import com.santiagoposadag.cs50.receiverpublisher.usecases.PostUserMessageToRabbitUseCase;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -19,7 +16,6 @@ import java.util.function.Function;
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
-
 
 @Configuration
 public class CommandRouter {
@@ -36,7 +32,6 @@ public class CommandRouter {
         return route(POST("/SendAction")
                 .and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(CryptoCurrencyDto.class).flatMap(executor));
-
     }
 
     @Bean
@@ -47,11 +42,8 @@ public class CommandRouter {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .bodyValue(result));
 
-
-
+        return route(POST("/SendUser")
+                .and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToMono(UserDto.class).flatMap(executor));
     }
-
-
-
-
 }
