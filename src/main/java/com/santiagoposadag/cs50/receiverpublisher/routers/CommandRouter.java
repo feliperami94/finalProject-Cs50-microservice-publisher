@@ -2,6 +2,7 @@ package com.santiagoposadag.cs50.receiverpublisher.routers;
 
 
 import com.santiagoposadag.cs50.receiverpublisher.dto.CryptoCurrencyDto;
+import com.santiagoposadag.cs50.receiverpublisher.dto.UserDto;
 import com.santiagoposadag.cs50.receiverpublisher.usecases.PostMessageToRabbitUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -21,8 +22,6 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @Configuration
 public class CommandRouter {
 
-    @Autowired
-    ApplicationEventPublisher publisher;
 
     @Bean
     public RouterFunction<ServerResponse> postActionRoute(PostMessageToRabbitUseCase postMessageToRabbit){
@@ -37,4 +36,15 @@ public class CommandRouter {
                 request -> request.bodyToMono(CryptoCurrencyDto.class).flatMap(executor));
 
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> postUserRoute(PostUserToRabbitUseCase postUserToRabbit){
+        Function<UserDto, Mono<ServerResponse>> executor =
+                userDto -> postUserToRabbit.apply(userDto).
+
+    }
+
+
+
+
 }
