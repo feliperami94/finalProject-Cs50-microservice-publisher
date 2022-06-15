@@ -1,10 +1,9 @@
 package com.santiagoposadag.cs50.receiverpublisher.routers;
 
-
 import com.santiagoposadag.cs50.receiverpublisher.dto.CryptoCurrencyDto;
+import com.santiagoposadag.cs50.receiverpublisher.dto.UserDto;
 import com.santiagoposadag.cs50.receiverpublisher.usecases.PostMessageToRabbitUseCase;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
+import com.santiagoposadag.cs50.receiverpublisher.usecases.PostUserMessageToRabbitUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -14,15 +13,13 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.*;
+import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
+import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
-
 
 @Configuration
 public class CommandRouter {
 
-    @Autowired
-    ApplicationEventPublisher publisher;
 
     @Bean
     public RouterFunction<ServerResponse> postActionRoute(PostMessageToRabbitUseCase postMessageToRabbit){
@@ -35,6 +32,18 @@ public class CommandRouter {
         return route(POST("/SendAction")
                 .and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(CryptoCurrencyDto.class).flatMap(executor));
+    }
 
+    @Bean
+    public RouterFunction<ServerResponse> postUserRoute(PostUserMessageToRabbitUseCase postUserToRabbit){
+        Function<UserDto, Mono<ServerResponse>> executor =
+                userDto -> postUserToRabbit.apply(userDto)
+                            .flatMap(result -> ServerResponse.ok()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .bodyValue(result));
+
+        return route(POST("/SendUser")
+                .and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToMono(UserDto.class).flatMap(executor));
     }
 }
